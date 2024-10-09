@@ -1,0 +1,40 @@
+name: Deploy Application
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build Frontend Docker image
+        run: |
+          docker build -t my-frontend-image:latest ./path/to/frontend
+
+      - name: Build Backend Docker image
+        run: |
+          docker build -t my-backend-image:latest ./path/to/backend
+
+      - name: Log in to Docker Hub
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin
+
+      - name: Push Docker images
+        run: |
+          docker push my-frontend-image:latest
+          docker push my-backend-image:latest
+
+      - name: Deploy Frontend to VM
+        run: |
+          ssh user@frontend-vm-ip "docker pull my-frontend-image:latest && docker run -d --name frontend-container my-frontend-image:latest"
+
+      - name: Deploy Backend to VM
+        run: |
+          ssh user@backend-vm-ip "docker pull my-backend-image:latest && docker run -d --name backend-container my-backend-image:latest"

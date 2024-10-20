@@ -4,6 +4,9 @@ FROM nginx:latest
 # Copia a configuração personalizada do nginx para o container
 COPY ./nginx.conf /etc/nginx/nginx.conf
 
+COPY ./sites-available/default /etc/nginx/sites-available/default
+
+
 # Copia os arquivos estáticos do frontend (se houver) para o diretório padrão do Nginx
 COPY ./static/ /usr/share/nginx/html/
 

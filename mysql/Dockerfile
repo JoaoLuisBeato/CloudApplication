@@ -1,6 +1,8 @@
 # Usa a imagem oficial do MySQL
 FROM mysql:latest
 
+COPY ./init /docker-entrypoint-initdb.d/
+
 # Define variáveis de ambiente para o MySQL (mudar para seus valores)
 ENV MYSQL_DATABASE=mydatabase
 ENV MYSQL_USER=myuser

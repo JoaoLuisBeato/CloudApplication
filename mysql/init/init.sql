@@ -23,7 +23,7 @@ CREATE TABLE usuarios (
 );
 
 INSERT INTO usuarios (email, senha)
-VALUES ('penis@denis.com', '1234');
+VALUES ('JoaoBeato@gmail.com', '1234');
 
 
 INSERT INTO ficha_tecnica_carro (marca, modelo, ano, motor, potencia_hp, torque_nm, combustivel, cambio, tracao, peso_kg, consumo_km_l, aceleracao_0_100, velocidade_maxima_km_h)

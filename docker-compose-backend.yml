@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  db:
+    build:
+      context: ./mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: mydatabase
+      MYSQL_USER: myuser
+      MYSQL_PASSWORD: mypassword
+    hostname: db
+    command: >
+      --wait_timeout=28800
+      --connect_timeout=600
+    volumes:
+      - db_data:/var/lib/mysql  # Persistindo dados do MySQL
+      - ./mysql/init:/docker-entrypoint-initdb.d/  # Carrega o init.sql
+    networks:
+      - backend_network  # Conectando à rede backend
+    # Healthcheck para verificar se o MySQL está pronto
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 30s  # Verifica a cada 30 segundos
+      timeout: 10s  # Tempo limite para cada verificação
+      retries: 5  # Tenta 5 vezes antes de marcar como falho
+      start_period: 90s  # Aguarda 30 segundos antes de iniciar a verificação
+
+  backend:
+    build:
+      context: ./backend  # Diretório onde está o Dockerfile do Flask
+    environment:
+      MYSQL_HOST: db  # Nome do serviço do MySQL
+      MYSQL_USER: myuser
+      MYSQL_PASSWORD: mypassword
+      MYSQL_DATABASE: mydatabase
+    depends_on:
+      db:
+        condition: service_healthy  # Aguarda o banco de dados ficar saudável antes de iniciar o backend
+    networks:
+      - backend_network  # Conectando à rede backend
+    ports:  # Mapeamento de portas
+      - "5000:5000"  # Mapeia a porta 5000 do contêiner para a porta 5000 do host
+
+volumes:
+  db_data:  # Volume para persistência do MySQL
+
+networks:
+  backend_network:
+    driver: bridge  # Rede interna para backend e banco de dados

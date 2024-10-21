@@ -1,18 +1,18 @@
-# Usa a imagem oficial do Python como base
-FROM python:3.9
+# Usando uma imagem oficial do Python
+FROM python:3.9-slim
 
-# Define o diretório de trabalho no container
+# Definindo o diretório de trabalho dentro do container
 WORKDIR /app
 
-# Copia o requirements.txt e instala as dependências
-COPY requirements.txt requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+# Instalando Flask e o MySQL Connector diretamente no Dockerfile
+RUN pip install flask mysql-connector-python flask-cors
 
-# Copia todo o código da aplicação Flask para o container
+# Copiando o código da aplicação Flask para o container
 COPY . .
 
-# Expondo a porta 5000 para a aplicação Flask
+# Expondo a porta 5000 para acessar o Flask
 EXPOSE 5000
 
-# Define o comando para iniciar o servidor Flask
+# Comando para rodar a aplicação Flask com Gunicorn
 CMD ["flask", "run", "--host=0.0.0.0"]
+

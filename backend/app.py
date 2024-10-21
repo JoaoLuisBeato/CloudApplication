@@ -87,14 +87,11 @@ def login():
 @app.route('/return_carro', methods=['GET'])
 def return_carro():
 
-    
-    modelo = request.form['modelo']
-
     mycursor = db.cursor()
-    sql_command_for_database = "SELECT * FROM ficha_tecnica_carro WHERE modelo = %s"
-    value = (modelo,)
+    sql_command_for_database = "SELECT * FROM ficha_tecnica_carro;"
+    
     try:
-        mycursor.execute(sql_command_for_database, value)
+        mycursor.execute(sql_command_for_database)
     except:
         return jsonify({'status': 'erro retornando carro'})
 

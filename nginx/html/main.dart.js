@@ -76711,7 +76711,7 @@ var $async$$0=A.T(function(a,b){if(a===1)return A.P(b,r)
 while(true)switch(s){case 0:o=p.a
 n=t.N
 s=3
-return A.Z(A.UY(A.eC("http://192.168.132.138:5000/login"),A.aG(["email",o.w,"password",o.x],n,n)),$async$$0)
+return A.Z(A.UY(A.eC("http://192.168.132.138:5000/api/login"),A.aG(["email",o.w,"password",o.x],n,n)),$async$$0)
 case 3:m=b
 s=m.b===200?4:6
 break
@@ -76762,7 +76762,7 @@ this.wo()},
 wo(){var s=0,r=A.S(t.H),q,p=this,o
 var $async$wo=A.T(function(a,b){if(a===1)return A.P(b,r)
 while(true)switch(s){case 0:s=3
-return A.Z(A.UY(A.eC("http://192.168.132.138:5000/return_marca"),null),$async$wo)
+return A.Z(A.UY(A.eC("http://192.168.132.138:5000/api/return_marca"),null),$async$wo)
 case 3:o=b
 if(p.c==null){s=1
 break}p.an(new A.a2R(p,o))
@@ -76774,7 +76774,7 @@ var $async$wq=A.T(function(b,c){if(b===1)return A.P(c,r)
 while(true)switch(s){case 0:p=t.N
 o=A
 s=2
-return A.Z(A.UY(A.eC("http://192.168.132.138:5000/return_modelo"),A.aG(["marca",a],p,p)),$async$wq)
+return A.Z(A.UY(A.eC("http://192.168.132.138:5000/api/return_modelo"),A.aG(["marca",a],p,p)),$async$wq)
 case 2:q.an(new o.a2T(q,c))
 return A.Q(null,r)}})
 return A.R($async$wq,r)},
@@ -76785,7 +76785,7 @@ while(true)switch(s){case 0:if(a==="Escolha a marca")a=""
 if(b==="Escolha o modelo")b=""
 o=t.N
 s=3
-return A.Z(A.UY(A.eC("http://192.168.132.138:5000/return_carro_avancado"),A.aG(["marca",a,"modelo",b,"ano",c],o,o)),$async$wp)
+return A.Z(A.UY(A.eC("http://192.168.132.138:5000/api/return_carro_avancado"),A.aG(["marca",a,"modelo",b,"ano",c],o,o)),$async$wp)
 case 3:n=e
 if(p.c==null){s=1
 break}p.an(new A.a2S(p,n))
@@ -77049,7 +77049,7 @@ s=8
 break
 case 9:o=t.N
 s=11
-return A.Z(A.UY(A.eC("http://192.168.132.138:5000/cadastro"),A.aG(["email",m.w,"password",m.y],o,o)),$async$$0)
+return A.Z(A.UY(A.eC("http://192.168.132.138:5000/api/cadastro"),A.aG(["email",m.w,"password",m.y],o,o)),$async$$0)
 case 11:n=b
 if(J.au(B.bC.da(0,A.UR(A.UG(n.e).c.a.h(0,"charset")).da(0,n.w)),"acesso")==="OK"){if(m.c==null){s=1
 break}o=p.b

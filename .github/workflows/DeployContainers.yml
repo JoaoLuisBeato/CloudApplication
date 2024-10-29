@@ -16,7 +16,7 @@ jobs:
     outputs:
       backend: ${{ steps.filter.outputs.backend }}
       mysql: ${{ steps.filter.outputs.mysql }}
-      frontend: ${{ steps.filter.outputs.frontend }}  # Alterado de nginx para frontend
+      nginx: ${{ steps.filter.outputs.frontend }}  # Alterado de nginx para frontend
       docker_compose_backend: ${{ steps.filter.outputs.docker_compose_backend }}
     steps:
       - uses: actions/checkout@v2
@@ -28,7 +28,7 @@ jobs:
               - 'backend/**'
             mysql:
               - 'mysql/**'
-            frontend:              # Alterado de nginx para frontend
+            nginx:              # Alterado de nginx para frontend
               - 'nginx/**'
             docker_compose_backend:
               - 'docker-compose-backend.yml'
@@ -67,13 +67,13 @@ jobs:
         with:
           context: ./mysql
           push: true
-          tags: ${{ env.DOCKER_HUB_USERNAME }}/mysql:latest
+          tags: joaoluisbeato/mysql:latest
 
       # Build e Push Frontend
       - name: Build and push frontend image
         if: needs.changes.outputs.frontend == 'true'
         uses: docker/build-push-action@v2
         with:
-          context: ./frontend
+          context: ./nginx
           push: true
-          tags: joaoluisbeato/frontend:latest  # Nome específico da sua imagem
+          tags: joaoluisbeato/nginx:latest  # Nome específico da sua imagem

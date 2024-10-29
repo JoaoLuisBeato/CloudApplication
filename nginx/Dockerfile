@@ -1,6 +1,6 @@
 # Usa a imagem oficial do Nginx
 FROM nginx:latest
-#dddd teste
+#dddddddd teste
 RUN rm /etc/nginx/conf.d/default.conf
 
 # Copia a configuração personalizada do nginx para o container

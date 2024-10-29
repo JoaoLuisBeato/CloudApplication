@@ -9,6 +9,8 @@ services:
       MYSQL_DATABASE: mydatabase
       MYSQL_USER: myuser
       MYSQL_PASSWORD: mypassword
+    ports:
+      - "3307:3306"
     hostname: db
     command: >
       --wait_timeout=28800

@@ -17,7 +17,11 @@ while True:
         break  # Sai do loop se a conexão for bem-sucedida
     except Exception as e:  # Captura qualquer exceção e armazena em e
         print(f"Tentando conectar ao MySQL... Erro: {e}")
-        time.sleep(5)  # Espera 5 segundos antes de tentar novamente
+        time.sleep(10)  # Espera 5 segundos antes de tentar novamente
+
+
+print("começou o flask")
+
 
 #Rota padrão da aplicação
 @app.route('/')

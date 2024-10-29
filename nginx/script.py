@@ -1,19 +1,31 @@
 import time
 import docker
-# teste  teste  teste
+
 # Configurações
 DOCKER_IMAGE = "joaoluisbeato/frontend"
 CHECK_INTERVAL = 60  # Intervalo de checagem em segundos (1 minuto)
 CONTAINER_NAME = "frontend-nginx"
 
-def build_image(client):
-    # Build da imagem Docker
-    print(f"Construindo a imagem {DOCKER_IMAGE}...")
-    client.images.build(path=".", tag=DOCKER_IMAGE)
-    print(f"Imagem {DOCKER_IMAGE} construída com sucesso.")
+def authenticate(client):
+    """Autentica no Docker Hub, se necessário."""
+    client.login(username='joaoluisbeato', password='')
+
+def check_for_updates(client):
+    """Verifica se há uma nova versão da imagem no Docker Hub."""
+    try:
+        image = client.images.get(DOCKER_IMAGE)
+        return image.id
+    except docker.errors.ImageNotFound:
+        return None
+
+def pull_latest_image(client):
+    """Baixa a versão mais recente da imagem do Docker Hub."""
+    print(f"Baixando a imagem mais recente {DOCKER_IMAGE} do Docker Hub...")
+    client.images.pull(DOCKER_IMAGE)
+    print(f"Imagem {DOCKER_IMAGE} baixada com sucesso.")
 
 def run_container(client):
-    # Inicia o contêiner com a imagem especificada
+    """Inicia o contêiner com a imagem especificada."""
     print(f"Iniciando o contêiner {CONTAINER_NAME}...")
     container = client.containers.run(
         DOCKER_IMAGE,
@@ -29,21 +41,27 @@ def main():
     last_image_id = None
     container = None
 
-    # Realiza o build da imagem e inicia o contêiner pela primeira vez
-    try:
-        build_image(client)
-        container = run_container(client)
-        last_image_id = client.images.get(DOCKER_IMAGE).id
+    # Autentica no Docker Hub
+    authenticate(client)
 
+    # Realiza o pull da imagem mais recente
+    pull_latest_image(client)
+    
+    # Verifica a versão local da imagem
+    last_image_id = check_for_updates(client)
+
+    # Inicia o contêiner pela primeira vez
+    try:
+        container = run_container(client)
     except Exception as e:
         print(f"Erro ao iniciar o contêiner: {e}")
         return
 
     while True:
         try:
-            # Realiza o build da imagem novamente
-            build_image(client)
-            new_image_id = client.images.get(DOCKER_IMAGE).id
+            # Puxa a imagem mais recente do Docker Hub
+            pull_latest_image(client)
+            new_image_id = check_for_updates(client)
 
             # Se houver uma nova versão da imagem, reinicia o contêiner
             if new_image_id != last_image_id:

@@ -6,10 +6,6 @@ DOCKER_IMAGE = "joaoluisbeato/frontend"
 CHECK_INTERVAL = 60  # Intervalo de checagem em segundos (1 minuto)
 CONTAINER_NAME = "frontend-nginx"
 
-def authenticate(client):
-    """Autentica no Docker Hub, se necessário."""
-    client.login(username='joaoluisbeato', password='Dkv*79122')
-
 def check_for_updates(client):
     """Verifica se há uma nova versão da imagem no Docker Hub."""
     try:
@@ -41,12 +37,9 @@ def main():
     last_image_id = None
     container = None
 
-    # Autentica no Docker Hub
-    authenticate(client)
-
-    # Realiza o pull da imagem mais recente
+    # Realiza o pull da imagem mais recente inicialmente
     pull_latest_image(client)
-    
+
     # Verifica a versão local da imagem
     last_image_id = check_for_updates(client)
 
@@ -64,7 +57,7 @@ def main():
             new_image_id = check_for_updates(client)
 
             # Se houver uma nova versão da imagem, reinicia o contêiner
-            if new_image_id != last_image_id:
+            if new_image_id and new_image_id != last_image_id:
                 print("Nova versão detectada! Reiniciando o contêiner...")
 
                 # Para e remove o contêiner antigo

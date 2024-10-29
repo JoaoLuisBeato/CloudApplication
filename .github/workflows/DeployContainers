@@ -1,0 +1,135 @@
+name: Docker CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
+      - 'mysql/**'
+      - 'frontend/**'  # Alterado de nginx para frontend
+      - 'docker-compose-backend.yml'
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      mysql: ${{ steps.filter.outputs.mysql }}
+      frontend: ${{ steps.filter.outputs.frontend }}  # Alterado de nginx para frontend
+      docker_compose_backend: ${{ steps.filter.outputs.docker_compose_backend }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            backend:
+              - 'backend/**'
+            mysql:
+              - 'mysql/**'
+            frontend:              # Alterado de nginx para frontend
+              - 'frontend/**'
+            docker_compose_backend:
+              - 'docker-compose-backend.yml'
+
+  build-and-push:
+    needs: changes
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Login to Docker Hub
+        if: ${{ needs.changes.outputs.backend == 'true' || needs.changes.outputs.mysql == 'true' || needs.changes.outputs.frontend == 'true' }}
+        uses: docker/login-action@v1
+        with:
+          username: ${{ env.DOCKER_HUB_USERNAME }}
+          password: ${{ env.DOCKER_HUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        if: ${{ needs.changes.outputs.backend == 'true' || needs.changes.outputs.mysql == 'true' || needs.changes.outputs.frontend == 'true' }}
+        uses: docker/setup-buildx-action@v1
+
+      # Build e Push Backend
+      - name: Build and push backend image
+        if: needs.changes.outputs.backend == 'true'
+        uses: docker/build-push-action@v2
+        with:
+          context: ./backend
+          push: true
+          tags: ${{ env.DOCKER_HUB_USERNAME }}/backend:latest
+
+      # Build e Push MySQL
+      - name: Build and push mysql image
+        if: needs.changes.outputs.mysql == 'true'
+        uses: docker/build-push-action@v2
+        with:
+          context: ./mysql
+          push: true
+          tags: ${{ env.DOCKER_HUB_USERNAME }}/mysql:latest
+
+      # Build e Push Frontend
+      - name: Build and push frontend image
+        if: needs.changes.outputs.frontend == 'true'
+        uses: docker/build-push-action@v2
+        with:
+          context: ./frontend
+          push: true
+          tags: joaoluisbeato/frontend:latest  # Nome específico da sua imagem
+
+  deploy-vm1:
+    needs: [changes, build-and-push]
+    runs-on: ubuntu-latest
+    if: needs.changes.outputs.frontend == 'true'  # Alterado de nginx para frontend
+    steps:
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh/
+          echo "${{ env.VM_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ env.VM1_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to VM1
+        run: |
+          ssh ${{ env.VM_USERNAME }}@${{ env.VM1_HOST }} '
+            docker pull joaoluisbeato/frontend:latest
+            docker stop frontend-container || true
+            docker rm frontend-container || true
+            docker run -d \
+              --name frontend-container \
+              -p 8080:80 \
+              joaoluisbeato/frontend:latest
+
+  deploy-vm2:
+    needs: [changes, build-and-push]
+    runs-on: ubuntu-latest
+    if: needs.changes.outputs.backend == 'true' || needs.changes.outputs.mysql == 'true' || needs.changes.outputs.docker_compose_backend == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh/
+          echo "${{ env.VM_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ env.VM2_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Copy docker-compose file
+        if: needs.changes.outputs.docker_compose_backend == 'true'
+        run: |
+          scp docker-compose-backend.yml ${{ env.VM_USERNAME }}@${{ env.VM2_HOST }}:~/
+
+      - name: Deploy to VM2
+        run: |
+          ssh ${{ env.VM_USERNAME }}@${{ env.VM2_HOST }} '
+            if [ "${{ needs.changes.outputs.backend }}" == "true" ]; then
+              docker pull ${{ env.DOCKER_HUB_USERNAME }}/backend:latest
+            fi
+            if [ "${{ needs.changes.outputs.mysql }}" == "true" ]; then
+              docker pull ${{ env.DOCKER_HUB_USERNAME }}/mysql:latest
+            fi
+            docker-compose -f docker-compose-backend.yml down
+            docker-compose -f docker-compose-backend.yml up -d
+          '

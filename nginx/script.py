@@ -1,6 +1,6 @@
 import time
 import docker
-# teste  teste
+# teste  teste  teste
 # Configurações
 DOCKER_IMAGE = "joaoluisbeato/frontend"
 CHECK_INTERVAL = 60  # Intervalo de checagem em segundos (1 minuto)

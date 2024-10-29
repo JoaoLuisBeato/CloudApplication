@@ -8,7 +8,7 @@ CONTAINER_NAME = "frontend-nginx"
 
 def authenticate(client):
     """Autentica no Docker Hub, se necessário."""
-    client.login(username='joaoluisbeato', password='')
+    client.login(username='joaoluisbeato', password='Dkv*79122')
 
 def check_for_updates(client):
     """Verifica se há uma nova versão da imagem no Docker Hub."""

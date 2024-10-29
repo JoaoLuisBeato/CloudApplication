@@ -7,7 +7,7 @@ on:
     paths:
       - 'backend/**'
       - 'mysql/**'
-      - 'nginx/**'  # Alterado de nginx para frontend
+      - 'nginx/**'  # Mantém o caminho para a pasta nginx
       - 'docker-compose-backend.yml'
 
 jobs:
@@ -16,7 +16,7 @@ jobs:
     outputs:
       backend: ${{ steps.filter.outputs.backend }}
       mysql: ${{ steps.filter.outputs.mysql }}
-      nginx: ${{ steps.filter.outputs.frontend }}  # Alterado de nginx para frontend
+      nginx: ${{ steps.filter.outputs.nginx }}  # Mudado para nginx
       docker_compose_backend: ${{ steps.filter.outputs.docker_compose_backend }}
     steps:
       - uses: actions/checkout@v2
@@ -28,7 +28,7 @@ jobs:
               - 'backend/**'
             mysql:
               - 'mysql/**'
-            nginx:              # Alterado de nginx para frontend
+            nginx:              # Usando nginx corretamente
               - 'nginx/**'
             docker_compose_backend:
               - 'docker-compose-backend.yml'
@@ -69,11 +69,11 @@ jobs:
           push: true
           tags: joaoluisbeato/mysql:latest
 
-      # Build e Push Frontend
+      # Build e Push Frontend (nginx)
       - name: Build and push frontend image
-        if: needs.changes.outputs.frontend == 'true'
+        if: needs.changes.outputs.nginx == 'true'  # Verifica se houve alteração na pasta nginx
         uses: docker/build-push-action@v2
         with:
           context: ./nginx
           push: true
-          tags: joaoluisbeato/frontend:latest  # Nome específico da sua imagem
+          tags: joaoluisbeato/frontend:latest  # Nome da imagem no Docker Hub

@@ -38,7 +38,8 @@ def cadastro():
     
     email_usuario = request.form['email']
     password_usuario = request.form['password']
-    
+
+    # Comentari teste
     # Inicializando parâmetros do banco de dados e passando para tabela usuario (padrão)
     # Comandos para inserção no banco de dados
     mycursor = db.cursor()

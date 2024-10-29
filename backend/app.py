@@ -22,7 +22,7 @@ while True:
 
 print("começou o flask")
 
-#teste3 teste 4 teste 5 teste 6
+# teste teste3 teste 4 teste 5 teste 6
 #Rota padrão da aplicação
 @app.route('/')
 def hello_world():

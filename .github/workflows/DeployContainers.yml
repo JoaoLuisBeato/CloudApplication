@@ -7,7 +7,7 @@ on:
     paths:
       - 'backend/**'
       - 'mysql/**'
-      - 'frontend/**'  # Alterado de nginx para frontend
+      - 'nginx/**'  # Alterado de nginx para frontend
       - 'docker-compose-backend.yml'
 
 jobs:
